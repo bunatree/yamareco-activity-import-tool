@@ -9,7 +9,9 @@ document.addEventListener('DOMContentLoaded', async function() {
   // 保存済みactivityDataがある場合は、ファイルのドロップ領域を隠す
   if (activityData) {
     dropAreaElm.classList.add('d-none');
-    showMsg('<div class="date">' + activityData.date + '</div>' + '<div class="title">' + activityData.title + '</div>', 'info', false)
+    const msgContent = '<div class="date">' + activityData.date + '</div>'
+                     + '<div class="title">' + activityData.title + '</div>';
+    showMsg(msgContent, 'info', false)
   }
 
   // 現在のアクティブタブのURLを取得
