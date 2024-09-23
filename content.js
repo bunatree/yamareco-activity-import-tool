@@ -162,15 +162,41 @@ async function yamaRecoStep1(jsonData) {
 
 }
 
+function yamaRecoStep2(jsonData) {
+
+  console.log('#### function yamaRecoStep2');
+  console.log({jsonData})
+
+  // DOMから写真リストのtextarea要素をすべて取得
+  const photoList = document.querySelectorAll('.photo_list .pcomment');
+  
+  // JSONのphotosデータを取得
+  const photos = jsonData.photos;
+  
+  // photos配列の長さとtextareaの数を考慮して、少ない方の数でループを回す
+  const minLength = Math.min(photos.length, photoList.length);
+  
+  for (let i = 0; i < minLength; i++) {
+    const memo = photos[i].memo;   // JSONデータからmemoを取得
+    const textareaElm = photoList[i]; // 該当のtextareaを取得
+    
+    // textareaにmemoを反映
+    textareaElm.value = memo;
+  }
+  
+  // デバッグ用に反映結果を出力
+  alert(`${minLength} 件の写真のメモを反映しました`);
+}
+
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   console.log({request});
 
   if (request.action === 'recordStep1') {
     yamaRecoStep1(request.data);
   } else if (request.action === 'recordStep2') {
-    //yamaRecoStep2(request.data);
+    yamaRecoStep2(request.data);
   } else if (request.action === 'recordStep4') {
     // yamaRecoStep4(request.data);
   }
-  
+
 });

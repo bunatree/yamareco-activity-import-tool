@@ -143,15 +143,18 @@ document.addEventListener('DOMContentLoaded', async function() {
 
   // ボタンがクリックされたときの動作
   document.getElementById('step1').addEventListener('click', function() {
+    console.log("You clicked button step1!");
     sendActionToTab('recordStep1');
   });
 
   document.getElementById('step2').addEventListener('click', function() {
-      sendActionToTab('recordStep2');
+    console.log("You clicked button step2!");
+    sendActionToTab('recordStep2');
   });
 
   document.getElementById('step4').addEventListener('click', function() {
-      sendActionToTab('recordStep4');
+    console.log("You clicked button step4!");
+    sendActionToTab('recordStep4');
   });
 
   function sendActionToTab(action) {
