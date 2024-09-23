@@ -102,11 +102,13 @@ function getAreaFromMapName(mapName) {
   // 対応表のキーに部分一致するものを探す
   for (const key in objMapNames) {
     if (mapName.includes(key)) {
-      return objMapNames[key]; // 一致するものが見つかったら、その地域と山域を返す
+      // 一致するものが見つかったら、その地域と山域を返す
+      return objMapNames[key];
     }
   }
 
-  return [0, 0]; // 一致するものがなければ[0, 0]を返す
+  // 一致するものがなければ[0, 0]を返す
+  return [0, 0];
 
 }
 
@@ -162,11 +164,13 @@ async function yamaRecoStep1(jsonData) {
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   console.log({request});
-  if (request.action === 'importActivityData') {
-    const jsonData = request.data;
-    // jsonData を解析してフォームに入力するロジックをここに記述
-    console.log('インポートされたデータ:', jsonData);
-    
-    yamaRecoStep1(jsonData);
+
+  if (request.action === 'recordStep1') {
+    yamaRecoStep1(request.data);
+  } else if (request.action === 'recordStep2') {
+    //yamaRecoStep2(request.data);
+  } else if (request.action === 'recordStep4') {
+    // yamaRecoStep4(request.data);
   }
+  
 });

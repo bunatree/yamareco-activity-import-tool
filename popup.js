@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
+
   const dropAreaElm = document.getElementById('drop-area');
   const msgDivElm = document.getElementById('msg');
 
@@ -8,6 +9,46 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const url = new URL(currentTab.url);
 
+
+    console.dir({url})
+    // Enable/disable buttons based on the URL
+    if (url.pathname.includes('step1_create.php') || url.pathname.includes('step1_edit.php')) {
+      setButtonState('step1',true);
+      setButtonState('step2',false);
+      setButtonState('step4',false);
+    } else if (url.pathname.includes('step2_photo.php')) {
+      setButtonState('step1',false);
+      setButtonState('step2',true);
+      setButtonState('step4',false);
+    } else if (url.pathname.includes('step4_imp.php')) {
+      setButtonState('step1',false);
+      setButtonState('step2',false);
+      setButtonState('step4',true);
+    }
+
+    function setButtonState(buttonId,state) {
+      console.log('enableButton ' + buttonId + ' ' + state);
+      const btnElm = document.getElementById(buttonId);
+      if (state) {
+        btnElm.disabled = false;
+        btnElm.classList.remove('btn-secondary');
+        btnElm.classList.add('btn-primary');
+        // btnElm.style.opacity = 1;
+      } else {
+        btnElm.disabled = true;
+        btnElm.classList.remove('btn-primary');
+        btnElm.classList.add('btn-secondary');
+        // btnElm.style.opacity = 0.5;
+      }
+    }
+  
+    function disableButton(buttonId) {
+      console.log('disableButton ' + buttonId);
+        const button = document.getElementById(buttonId);
+        button.disabled = true;
+        button.style.opacity = 0.5;
+    }
+  
     // 山行記録作成ページのstep1かどうかを確認
     if (url.hostname.includes('yamareco.com') && (url.pathname.includes('/step1_create.php') || url.pathname.includes('/step1_edit.php'))) {
       // ドラッグ＆ドロップ領域のメッセージを変更
@@ -66,6 +107,16 @@ document.addEventListener('DOMContentLoaded', function() {
   
       // 正常に読み込めた(^^)
       msgDivElm.textContent = 'activity.jsonを正常に読み込みました。';
+      msgDivElm.classList.remove('d-none');
+      msgDivElm.classList.add('alert-success','d-block');
+
+      // ファイルのドロップエリアを非表示
+      const dropAreaElm = document.getElementById('drop-area');
+      dropAreaElm.classList.add('d-none');
+
+      // ボタンエリアを表示
+      const btnAreaElm = document.getElementById('button-area');
+      btnAreaElm.classList.remove('d-none');
   
       // 念のため、今後の処理のためにデータを保存する
       chrome.storage.local.set({ activityData: jsonData }, function() {
@@ -82,7 +133,32 @@ document.addEventListener('DOMContentLoaded', function() {
       msgDivElm.textContent = 'ファイルの読み込みに失敗しました。';
     };
   
-    reader.readAsText(file); // ファイルをテキストとして読み込む
+    // ファイルをテキストとして読み込む
+    reader.readAsText(file);
   }
+
+  // ボタンがクリックされたときの動作
+  document.getElementById('step1').addEventListener('click', function() {
+    sendActionToTab('recordStep1');
+  });
+
+  document.getElementById('step2').addEventListener('click', function() {
+      sendActionToTab('recordStep2');
+  });
+
+  document.getElementById('step4').addEventListener('click', function() {
+      sendActionToTab('recordStep4');
+  });
+
+  function sendActionToTab(action) {
+    chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+        chrome.storage.local.get('activityData', function(result) {
+            chrome.tabs.sendMessage(tabs[0].id, { action: action, data: result.activityData });
+        });
+    });
+  }
+
+
+  
   
 });
