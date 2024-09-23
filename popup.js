@@ -1,8 +1,16 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
 
   const dropAreaElm = document.getElementById('drop-area');
   const msgDivElm = document.getElementById('msg');
   const alertDivElm = document.getElementById('alert');
+
+  // loadStoredDataを呼び出し、結果を待つ
+  const activityData = await loadStoredData();
+  // 保存済みactivityDataがある場合は、ファイルのドロップ領域を隠す
+  if (activityData) {
+    dropAreaElm.classList.add('d-none');
+    showMsg('<div class="date">' + activityData.date + '</div>' + '<div class="title">' + activityData.title + '</div>', 'info', false)
+  }
 
   // 現在のアクティブタブのURLを取得
   chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
@@ -38,13 +46,6 @@ document.addEventListener('DOMContentLoaded', function() {
         btnElm.classList.remove('btn-primary');
         btnElm.classList.add('btn-secondary');
       }
-    }
-  
-    function disableButton(buttonId) {
-      console.log('disableButton ' + buttonId);
-        const button = document.getElementById(buttonId);
-        button.disabled = true;
-        button.style.opacity = 0.5;
     }
   
     // 山行記録作成ページのstep1かどうかを確認
@@ -108,9 +109,7 @@ document.addEventListener('DOMContentLoaded', function() {
       alertDivElm.textContent = 'activity.json 読み込み完了';
 
       // 読み込んだ活動日記の概要などを表示
-      msgDivElm.classList.remove('d-none');
-      msgDivElm.innerHTML = '<div class="date">' + jsonData.date + '</div>'
-                          + '<div class="title">' + jsonData.title + '</div>';
+      showMsg('<div class="date">' + jsonData.date + '</div>' + '<div class="title">' + jsonData.title + '</div>', 'info', false)
 
       // ファイルのドロップエリアを非表示
       dropAreaElm.classList.add('d-none');
@@ -162,8 +161,28 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function showAlert(htmlContent, type, autoHide) {
+    alertDivElm.classList.remove('d-none','alert-primary','alert-secondary','alert-success','alert-info','alert-warning');
+    alertDivElm.classList.add('alert-' + type);
+    alertDivElm.innerHTML = htmlContent;
+  }
+
+  function showMsg(htmlContent, type, autoHide) {
     msgDivElm.classList.remove('d-none','alert-primary','alert-secondary','alert-success','alert-info','alert-warning');
     msgDivElm.classList.add('alert-' + type);
+    msgDivElm.innerHTML = htmlContent;
+  }
+
+  function loadStoredData() {
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.get('activityData', function(result) {
+        const activityData = result.activityData;
+        if (activityData && typeof activityData === 'object') {
+          resolve(activityData);  // データがあればresolve
+        } else {
+          resolve(null);  // データがなければnullでresolve
+        }
+      });
+    });
   }
   
   
