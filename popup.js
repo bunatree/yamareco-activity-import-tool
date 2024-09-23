@@ -2,43 +2,41 @@ document.addEventListener('DOMContentLoaded', function() {
 
   const dropAreaElm = document.getElementById('drop-area');
   const msgDivElm = document.getElementById('msg');
+  const alertDivElm = document.getElementById('alert');
 
   // 現在のアクティブタブのURLを取得
   chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
     const currentTab = tabs[0];
-
     const url = new URL(currentTab.url);
 
-
-    console.dir({url})
     // Enable/disable buttons based on the URL
     if (url.pathname.includes('step1_create.php') || url.pathname.includes('step1_edit.php')) {
-      setButtonState('step1',true);
-      setButtonState('step2',false);
-      setButtonState('step4',false);
+      setButtonStateAll([true,false,false]); // Enable step1
     } else if (url.pathname.includes('step2_photo.php')) {
-      setButtonState('step1',false);
-      setButtonState('step2',true);
-      setButtonState('step4',false);
+      setButtonStateAll([false,true,false]); // Enable step2
     } else if (url.pathname.includes('step4_imp.php')) {
-      setButtonState('step1',false);
-      setButtonState('step2',false);
-      setButtonState('step4',true);
+      setButtonStateAll([false,false,true]); // Enable step4
+    }
+
+    function setButtonStateAll(arrayState) {
+      const arrayStep = [1,2,4];
+      arrayStep.forEach((step, index) => {
+        const buttonId = `step${step}`;
+        const state = arrayState[index];
+        setButtonState(buttonId, state);
+      });
     }
 
     function setButtonState(buttonId,state) {
-      console.log('enableButton ' + buttonId + ' ' + state);
       const btnElm = document.getElementById(buttonId);
       if (state) {
         btnElm.disabled = false;
         btnElm.classList.remove('btn-secondary');
         btnElm.classList.add('btn-primary');
-        // btnElm.style.opacity = 1;
       } else {
         btnElm.disabled = true;
         btnElm.classList.remove('btn-primary');
         btnElm.classList.add('btn-secondary');
-        // btnElm.style.opacity = 0.5;
       }
     }
   
@@ -74,13 +72,13 @@ document.addEventListener('DOMContentLoaded', function() {
   dropAreaElm.addEventListener('drop', (event) => {
     event.preventDefault();
     dropAreaElm.classList.remove('dragover');
-    msgDivElm.textContent = ''; // メッセージをクリア
+    alertDivElm.textContent = ''; // メッセージをクリア
 
     const files = event.dataTransfer.files;
     if (files.length > 0) {
       const file = files[0];
       if (file.name !== 'activity.json') {
-        msgDivElm.textContent = 'ドロップされたファイルはactivity.jsonではありません';
+        showAlert('ドロップされたファイルはactivity.jsonではありません','warning',true);
         return;
       }
       readFile(file);
@@ -101,17 +99,20 @@ document.addEventListener('DOMContentLoaded', function() {
         jsonData = JSON.parse(content);
       } catch (error) {
         // 変換できなかった場合（つまりJSON形式でない場合）はエラーメッセージを表示
-        msgDivElm.textContent = 'ファイルはJSON形式ではありません。';
+        showAlert('ファイルはJSON形式ではありません。','warning',true);
         return; // 処理を中断
       }
   
       // 正常に読み込めた(^^)
-      msgDivElm.textContent = 'activity.jsonを正常に読み込みました。';
+      showAlert('activity.json 読み込み完了','success',true);
+      alertDivElm.textContent = 'activity.json 読み込み完了';
+
+      // 読み込んだ活動日記の概要などを表示
       msgDivElm.classList.remove('d-none');
-      msgDivElm.classList.add('alert-success','d-block');
+      msgDivElm.innerHTML = '<div class="date">' + jsonData.date + '</div>'
+                          + '<div class="title">' + jsonData.title + '</div>';
 
       // ファイルのドロップエリアを非表示
-      const dropAreaElm = document.getElementById('drop-area');
       dropAreaElm.classList.add('d-none');
 
       // ボタンエリアを表示
@@ -122,15 +123,17 @@ document.addEventListener('DOMContentLoaded', function() {
       chrome.storage.local.set({ activityData: jsonData }, function() {
         console.log('データが保存されました');
       });
+
+
   
       // 現在のタブにデータを送信する
-      chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, { action: 'importActivityData', data: jsonData });
-      });
+      // chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+      //   chrome.tabs.sendMessage(tabs[0].id, { action: 'importActivityData', data: jsonData });
+      // });
     };
   
     reader.onerror = function() {
-      msgDivElm.textContent = 'ファイルの読み込みに失敗しました。';
+      showAlert('ファイルの読み込みに失敗しました。','warning',true);
     };
   
     // ファイルをテキストとして読み込む
@@ -158,7 +161,10 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-
+  function showAlert(htmlContent, type, autoHide) {
+    msgDivElm.classList.remove('d-none','alert-primary','alert-secondary','alert-success','alert-info','alert-warning');
+    msgDivElm.classList.add('alert-' + type);
+  }
   
   
 });

@@ -13,12 +13,14 @@
     <p>このページでは利用できません。</p>
   </div>
 
-  <div id="msg" class="alert d-none"></div>
+  <div id="alert" class="alert d-none"></div>
+  <div id="msg" class="alert alert-info d-none"></div>
 
-  <div id="button-area" class="d-grid gap-2 d-none">
-    <button id="step1" class="btn btn-sm btn-secondary">日程・概要を反映させる</button>
-    <button id="step2" class="btn btn-sm btn-secondary">写真メモを反映させる</button>
-    <button id="step4" class="btn btn-sm btn-secondary">感想を反映させる</button>
+  <div id="button-area" class="d-grid gap-2">
+    <button id="step1" class="btn btn-sm btn-secondary" title="日程・概要を反映させる">日程・概要を反映</button>
+    <button id="step2" class="btn btn-sm btn-secondary" title="写真メモを反映させる">写真メモを反映</button>
+    <button id="step4" class="btn btn-sm btn-secondary" title="感想を反映させる">感想を反映</button>
+    <button id="clear" class="btn btn-sm btn-secondary" title="読み込み済みデータをクリアする">データ クリア</button>
   </div>
 
   <script src="popup.js"></script>
