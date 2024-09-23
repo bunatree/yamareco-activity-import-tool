@@ -83,6 +83,34 @@ function getGenreFromTags(tags) {
 
 }
 
+function getAreaFromMapName(mapName) {
+
+  // YAMAPとヤマレコの地域および山域の対応表
+  // YAMAPは地図が分割されていたり重複していたりしてわかりにくい...
+  const objMapNames = {
+    "塔ノ岳・丹沢山・蛭ヶ岳": [300, 307],
+    "大室山・畦ヶ丸山・菰釣山": [300, 307],
+    "三国山・大洞山・不老山": [300, 307],
+    "高麗山・湘南平・鷹取山": [300, 307],
+    "三浦アルプス・二子山・仙元山": [300, 308],
+    "大楠山・武山・三浦富士": [300, 308],
+    "三浦市・関東ふれあいの道": [300, 308],
+    "箱根山・神山": [300, 309],
+    // 必要に応じてさらに追加
+  };
+
+  // 対応表のキーに部分一致するものを探す
+  for (const key in objMapNames) {
+    if (mapName.includes(key)) {
+      return objMapNames[key]; // 一致するものが見つかったら、その地域と山域を返す
+    }
+  }
+
+  return [0, 0]; // 一致するものがなければ[0, 0]を返す
+
+}
+
+
 async function yamaRecoStep1(jsonData) {
   console.log('#### function yamaRecoStep1');
   console.log({jsonData})
@@ -111,6 +139,12 @@ async function yamaRecoStep1(jsonData) {
   const genreNum = getGenreFromTags(jsonData.tags);
   // ジャンルのドロップダウンリストに反映
   genreSelectElm.value = genreNum;
+
+  // YAMAPの地図名からヤマレコの山域を特定する
+  const regionMt = getAreaFromMapName(jsonData.mapName);
+  // エリア選択ドロップダウンリストに反映
+  area1SelectElm.value = regionMt[0];
+  area2SelectElm.value = regionMt[1];
 
   // 山行日数を取得
   const numDays = getNumberOfDays(jsonData.days);
