@@ -1,0 +1,12 @@
+#Mac
+.DS_Store
+.DS_Store?
+.AppleDouble
+# Thumbnails
+._*
+# Files that might appear on external disk
+.Spotlight-V100
+.Trashes
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
