@@ -1,0 +1,2 @@
+# yamareco-activity-import-tool
+YAMAPからエクスポートされたデータをヤマレコに山行記録としてインポートするツール
