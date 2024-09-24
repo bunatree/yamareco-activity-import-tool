@@ -1,43 +1,33 @@
 document.addEventListener('DOMContentLoaded', async function() {
 
   const dropAreaElm = document.getElementById('drop-area');
-  const msgDivElm = document.getElementById('msg');
-  const alertDivElm = document.getElementById('alert');
+  dropAreaElm.querySelector('.msg-container .msg').textContent = 'ドラッグ＆ドロップ';
+  dropAreaElm.querySelector('.msg-container .file-name').textContent = 'activity.json';
+
+  setupActivityTrash();
 
   // loadStoredDataを呼び出し、結果を待つ
   const activityData = await loadStoredData();
-  // 保存済みactivityDataがある場合は、ファイルのドロップ領域を隠す
+
   if (activityData) {
-    dropAreaElm.classList.add('d-none');
-    const msgContent = '<div class="d-flex">'
-                     + '<div class="summary overflow-hidden">'
-                     + '<div class="date">' + activityData.date + '</div>'
-                     + '<div class="title">' + activityData.title + '</div>'
-                     + '</div>'
-                     + '<div class="trash">'
-                     + '<a href="javascript:void(0);" title="読み込み済みデータをクリアする"><i class="bi bi-trash"></i></a>'
-                     + '</div>'
-                     + '</div>';
-    showMsg(msgContent, 'info', false);
-    const trashAnchorElm = document.querySelector('#msg .trash a');
-    trashAnchorElm.addEventListener('click', (event) => {
-      // ストレージからデータを削除
-      chrome.storage.local.remove('activityData', function() {
-        console.log('保存されていたデータが削除されました');
-        
-        // メッセージとUIをリセット
-        showMsg('データが削除されました', 'success', true);
-        
-        // ファイルドロップ領域を再表示
-        dropAreaElm.classList.remove('d-none');
-      });
-    });
-  }
+    // 保存済みactivityDataがある場合
+    console.log('Yes! Loading activityData...');
+    showActivity(activityData.date, activityData.title, 'info');
+  } else {
+    // 保存済みactivityDataがない場合
+    console.log('No activityData. Let the user upload activity.json.');
+    showDropArea();
+  }  
 
   // 現在のアクティブタブのURLを取得
   chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
     const currentTab = tabs[0];
     const url = new URL(currentTab.url);
+
+    if (!url.hostname.includes('yamareco.com') && !url.pathname.includes('/modules/yamareco')) {
+      showAlert('この拡張機能は、ヤマレコの山行記録作成/編集ページでのみ使用できます。','info',false);
+      hideDropArea();
+    }
 
     // Enable/disable buttons based on the URL
     if (url.pathname.includes('step1_create.php') || url.pathname.includes('step1_edit.php')) {
@@ -46,40 +36,30 @@ document.addEventListener('DOMContentLoaded', async function() {
       setButtonStateAll([false,true,false]); // Enable step2
     } else if (url.pathname.includes('step4_imp.php')) {
       setButtonStateAll([false,false,true]); // Enable step4
-    }
-
-    function setButtonStateAll(arrayState) {
-      const arrayStep = [1,2,4];
-      arrayStep.forEach((step, index) => {
-        const buttonId = `step${step}`;
-        const state = arrayState[index];
-        setButtonState(buttonId, state);
-      });
-    }
-
-    function setButtonState(buttonId,state) {
-      const btnElm = document.getElementById(buttonId);
-      if (state) {
-        btnElm.disabled = false;
-        btnElm.classList.remove('btn-secondary');
-        btnElm.classList.add('btn-primary');
-      } else {
-        btnElm.disabled = true;
-        btnElm.classList.remove('btn-primary');
-        btnElm.classList.add('btn-secondary');
-      }
-    }
-  
-    // 山行記録作成ページかどうかをチェック
-    if (url.hostname.includes('yamareco.com') && (url.pathname.includes('/modules/yamareco'))) {
-      dropAreaElm.querySelector('.msg-container .msg').textContent = 'ドラッグ＆ドロップ';
-      dropAreaElm.querySelector('.msg-container .file-name').textContent = 'activity.json';
-      showDropArea();
-    } else {
-      showAlert('この拡張機能は、ヤマレコの山行記録作成/編集ページでのみ使用できます。','info',false);
-      hideDropArea();
-    }
+    }  
   });
+
+  function setButtonStateAll(arrayState) {
+    const arrayStep = [1,2,4];
+    arrayStep.forEach((step, index) => {
+      const buttonId = `step${step}`;
+      const state = arrayState[index];
+      setButtonState(buttonId, state);
+    });
+  }
+
+  function setButtonState(buttonId,state) {
+    const btnElm = document.getElementById(buttonId);
+    if (state) {
+      btnElm.disabled = false;
+      btnElm.classList.remove('btn-secondary');
+      btnElm.classList.add('btn-primary');
+    } else {
+      btnElm.disabled = true;
+      btnElm.classList.remove('btn-primary');
+      btnElm.classList.add('btn-secondary');
+    }
+  }
 
   // ドラッグオーバー時にスタイルを変更
   dropAreaElm.addEventListener('dragover', (event) => {
@@ -96,7 +76,6 @@ document.addEventListener('DOMContentLoaded', async function() {
   dropAreaElm.addEventListener('drop', (event) => {
     event.preventDefault();
     dropAreaElm.classList.remove('dragover');
-    alertDivElm.textContent = ''; // メッセージをクリア
 
     const files = event.dataTransfer.files;
     if (files.length > 0) {
@@ -129,10 +108,9 @@ document.addEventListener('DOMContentLoaded', async function() {
   
       // 正常に読み込めた(^^)
       showAlert('activity.json 読み込み完了','success',true);
-      alertDivElm.textContent = 'activity.json 読み込み完了';
 
       // 読み込んだ活動日記の概要などを表示
-      showMsg('<div class="date">' + jsonData.date + '</div>' + '<div class="title">' + jsonData.title + '</div>', 'info', false)
+      showActivity(jsonData.date, jsonData.title, 'info');
 
       // ファイルのドロップエリアを非表示
       hideDropArea();
@@ -185,43 +163,49 @@ document.addEventListener('DOMContentLoaded', async function() {
   }
 
   function showDropArea() {
+    console.log('showDropArea')
     dropAreaElm.classList.remove('d-none');
   }
 
   function hideDropArea() {
+    console.log('hideDropArea')
     dropAreaElm.classList.add('d-none');
   }
 
   function showAlert(htmlContent, type, autoHide) {
+    const alertDivElm = document.getElementById('alert');
     alertDivElm.classList.remove('d-none','alert-primary','alert-secondary','alert-success','alert-info','alert-warning');
     alertDivElm.classList.add('alert-' + type);
     alertDivElm.innerHTML = htmlContent;
     if (autoHide) {
-      fadeOut(alertDivElm,1500,1000);
+      fadeOut(alertDivElm,1500);
     }
   }
 
-  function showMsg(htmlContent, type, autoHide) {
-    msgDivElm.classList.remove('d-none','alert-primary','alert-secondary','alert-success','alert-info','alert-warning');
-    msgDivElm.classList.add('alert-' + type);
-    msgDivElm.innerHTML = htmlContent;
-    if (autoHide) {
-      fadeOut(msgDivElm,1500,1000);
-    }
+  function showActivity(date, title, type) {
+    console.log(`showActivity `);
+    const activityDivElm = document.getElementById('activity');
+    activityDivElm.classList.remove('d-none','alert-primary','alert-secondary','alert-success','alert-info','alert-warning');
+    activityDivElm.classList.add('alert-' + type);
+    activityDivElm.querySelector('.date').textContent = date;
+    activityDivElm.querySelector('.title').textContent = title;
   }
 
-  function fadeOut(elm,waitMs,processMs) {
+  function hideActivity() {
+    console.log('hideActivity')
+    const activityDivElm = document.getElementById('activity');
+    activityDivElm.classList.add('d-none');
+  }
+
+  function fadeOut(elm,waitMs) {
     setTimeout(() => {
-      // フェードアウト処理
-      elm.style.transition = 'opacity 1s';  // フェードアウトのためのトランジション
-      elm.style.opacity = '0';  // 完全に透明にする
-
-      // フェードアウト完了後に非表示にする
+      elm.style.transition = 'opacity 1s';
+      elm.style.opacity = '0';
       setTimeout(() => {
-        elm.classList.add('d-none');  // 完全に消す
-        elm.style.opacity = '1';  // 次に使うときのために透明度をリセット
-      }, processMs);  // 1秒後に非表示に
-    }, waitMs);  // メッセージが表示されてから1.5秒後にフェードアウトを開始
+        elm.classList.add('d-none');
+        elm.style.opacity = '1';
+      }, 1000);
+    }, waitMs);
   }
 
   function loadStoredData() {
@@ -237,5 +221,15 @@ document.addEventListener('DOMContentLoaded', async function() {
     });
   }
   
+  function setupActivityTrash() {
+    const trashAnchorElm = document.querySelector('#activity .trash i');
+    trashAnchorElm.addEventListener('click', (event) => {
+      chrome.storage.local.remove('activityData', function() {
+        showAlert('データが削除されました', 'success', true);
+        showDropArea();
+        hideActivity();
+      });
+    });
+  }
   
 });

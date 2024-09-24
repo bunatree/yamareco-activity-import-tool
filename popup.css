@@ -27,10 +27,13 @@ p {
   margin: 0;
 }
 
-#msg {
+#activity {
   .date, .title {
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow-x: hidden;
+  }
+  .trash i {
+    cursor: pointer;
   }
 }

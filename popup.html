@@ -11,11 +11,22 @@
   <h1 class="h3">Yamareco Activity Import Tool</h1>
 
   <div id="alert" class="alert d-none"></div>
-  <div id="msg" class="alert alert-info d-none"></div>
 
-  <div id="drop-area">
+  <div id="activity" class="alert alert-info d-none">
+    <div class="d-flex">
+      <div class="summary overflow-hidden">
+        <div class="date"></div>
+        <div class="title"></div>
+      </div>
+      <div class="trash">
+        <i class="bi bi-trash" title="データをクリアする"></i>
+      </div>
+    </div>
+  </div>
+
+  <div id="drop-area" class="d-none">
     <div class="msg-container">
-      <div class="msg">このページでは利用できません。</div>
+      <div class="msg"></div>
       <div class="file-name"></div>
     </div>
   </div>
