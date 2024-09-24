@@ -1,8 +1,8 @@
 document.addEventListener('DOMContentLoaded', async function() {
 
   const dropAreaElm = document.getElementById('drop-area');
-  dropAreaElm.querySelector('.msg-container .msg').textContent = 'ドラッグ＆ドロップ';
-  dropAreaElm.querySelector('.msg-container .file-name').textContent = 'activity.json';
+  dropAreaElm.querySelector('.msg').textContent = 'ドラッグ＆ドロップ';
+  dropAreaElm.querySelector('.file-name').textContent = 'activity.json';
 
   setupActivityTrash();
 
@@ -163,12 +163,10 @@ document.addEventListener('DOMContentLoaded', async function() {
   }
 
   function showDropArea() {
-    console.log('showDropArea')
     dropAreaElm.classList.remove('d-none');
   }
 
   function hideDropArea() {
-    console.log('hideDropArea')
     dropAreaElm.classList.add('d-none');
   }
 
