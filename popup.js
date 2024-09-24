@@ -9,9 +9,20 @@ document.addEventListener('DOMContentLoaded', async function() {
   // 保存済みactivityDataがある場合は、ファイルのドロップ領域を隠す
   if (activityData) {
     dropAreaElm.classList.add('d-none');
-    const msgContent = '<div class="date">' + activityData.date + '</div>'
-                     + '<div class="title">' + activityData.title + '</div>';
-    showMsg(msgContent, 'info', false)
+    const msgContent = '<div class="d-flex">'
+                     + '<div class="summary overflow-hidden">'
+                     + '<div class="date">' + activityData.date + '</div>'
+                     + '<div class="title">' + activityData.title + '</div>'
+                     + '</div>'
+                     + '<div class="trash">'
+                     + '<a href="javascript:void(0);" title="読み込み済みデータをクリアする"><i class="bi bi-trash"></i></a>'
+                     + '</div>'
+                     + '</div>';
+    showMsg(msgContent, 'info', false);
+    const trashAnchorElm = document.querySelector('#msg .trash a');
+    trashAnchorElm.addEventListener('click', (event) => {
+      alert('Clear the saved data.');
+    });
   }
 
   // 現在のアクティブタブのURLを取得

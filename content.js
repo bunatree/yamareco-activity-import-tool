@@ -167,10 +167,8 @@ function yamaRecoStep2(jsonData) {
   console.log('#### function yamaRecoStep2');
   console.log({jsonData})
 
-  // DOMから写真リストのtextarea要素をすべて取得
   const photoList = document.querySelectorAll('.photo_list .pcomment');
   
-  // JSONのphotosデータを取得
   const photos = jsonData.photos;
   
   // photos配列の長さとtextareaの数を考慮して、少ない方の数でループを回す
@@ -184,8 +182,20 @@ function yamaRecoStep2(jsonData) {
     textareaElm.value = memo;
   }
   
-  // デバッグ用に反映結果を出力
-  alert(`${minLength} 件の写真のメモを反映しました`);
+  console.log(`Inserted ${minLength} notes.`);
+
+}
+
+function yamaRecoStep4(jsonData) {
+
+  const textareaElm = document.getElementById('impression');
+  if (textareaElm) {
+    textareaElm.value = jsonData.description;
+    console.log('Inserted the description into the textarea.');
+  } else {
+    console.error('Couldn\' find the textarea with id impression');
+  }
+
 }
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
@@ -196,7 +206,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   } else if (request.action === 'recordStep2') {
     yamaRecoStep2(request.data);
   } else if (request.action === 'recordStep4') {
-    // yamaRecoStep4(request.data);
+    yamaRecoStep4(request.data);
   }
 
 });
