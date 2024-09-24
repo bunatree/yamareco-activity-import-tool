@@ -220,8 +220,8 @@ document.addEventListener('DOMContentLoaded', async function() {
   }
   
   function setupActivityTrash() {
-    const trashAnchorElm = document.querySelector('#activity .trash i');
-    trashAnchorElm.addEventListener('click', (event) => {
+    const trashIconElm = document.querySelector('#activity .trash i');
+    trashIconElm.addEventListener('click', (event) => {
       chrome.storage.local.remove('activityData', function() {
         showAlert('データが削除されました', 'success', true);
         showDropArea();
