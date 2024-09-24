@@ -21,7 +21,16 @@ document.addEventListener('DOMContentLoaded', async function() {
     showMsg(msgContent, 'info', false);
     const trashAnchorElm = document.querySelector('#msg .trash a');
     trashAnchorElm.addEventListener('click', (event) => {
-      alert('Clear the saved data.');
+      // ストレージからデータを削除
+      chrome.storage.local.remove('activityData', function() {
+        console.log('保存されていたデータが削除されました');
+        
+        // メッセージとUIをリセット
+        showMsg('データが削除されました', 'success', true);
+        
+        // ファイルドロップ領域を再表示
+        dropAreaElm.classList.remove('d-none');
+      });
     });
   }
 
@@ -61,13 +70,14 @@ document.addEventListener('DOMContentLoaded', async function() {
       }
     }
   
-    // 山行記録作成ページのstep1かどうかを確認
-    if (url.hostname.includes('yamareco.com') && (url.pathname.includes('/step1_create.php') || url.pathname.includes('/step1_edit.php'))) {
-      // ドラッグ＆ドロップ領域のメッセージを変更
-      dropAreaElm.querySelector('p').textContent = 'activity.jsonをドラッグ＆ドロップしてください';
+    // 山行記録作成ページかどうかをチェック
+    if (url.hostname.includes('yamareco.com') && (url.pathname.includes('/modules/yamareco'))) {
+      dropAreaElm.querySelector('.msg-container .msg').textContent = 'ドラッグ＆ドロップ';
+      dropAreaElm.querySelector('.msg-container .file-name').textContent = 'activity.json';
+      showDropArea();
     } else {
-      // 対応していないページの場合
-      dropAreaElm.querySelector('p').textContent = 'この拡張機能は山行記録作成開始ページでのみ使用できます。';
+      showAlert('この拡張機能は、ヤマレコの山行記録作成/編集ページでのみ使用できます。','info',false);
+      hideDropArea();
     }
   });
 
@@ -125,7 +135,7 @@ document.addEventListener('DOMContentLoaded', async function() {
       showMsg('<div class="date">' + jsonData.date + '</div>' + '<div class="title">' + jsonData.title + '</div>', 'info', false)
 
       // ファイルのドロップエリアを非表示
-      dropAreaElm.classList.add('d-none');
+      hideDropArea();
 
       // ボタンエリアを表示
       const btnAreaElm = document.getElementById('button-area');
@@ -135,8 +145,6 @@ document.addEventListener('DOMContentLoaded', async function() {
       chrome.storage.local.set({ activityData: jsonData }, function() {
         console.log('データが保存されました');
       });
-
-
   
       // 現在のタブにデータを送信する
       // chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
@@ -170,22 +178,50 @@ document.addEventListener('DOMContentLoaded', async function() {
 
   function sendActionToTab(action) {
     chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-        chrome.storage.local.get('activityData', function(result) {
-            chrome.tabs.sendMessage(tabs[0].id, { action: action, data: result.activityData });
-        });
+      chrome.storage.local.get('activityData', function(result) {
+        chrome.tabs.sendMessage(tabs[0].id, { action: action, data: result.activityData });
+      });
     });
+  }
+
+  function showDropArea() {
+    dropAreaElm.classList.remove('d-none');
+  }
+
+  function hideDropArea() {
+    dropAreaElm.classList.add('d-none');
   }
 
   function showAlert(htmlContent, type, autoHide) {
     alertDivElm.classList.remove('d-none','alert-primary','alert-secondary','alert-success','alert-info','alert-warning');
     alertDivElm.classList.add('alert-' + type);
     alertDivElm.innerHTML = htmlContent;
+    if (autoHide) {
+      fadeOut(alertDivElm,1500,1000);
+    }
   }
 
   function showMsg(htmlContent, type, autoHide) {
     msgDivElm.classList.remove('d-none','alert-primary','alert-secondary','alert-success','alert-info','alert-warning');
     msgDivElm.classList.add('alert-' + type);
     msgDivElm.innerHTML = htmlContent;
+    if (autoHide) {
+      fadeOut(msgDivElm,1500,1000);
+    }
+  }
+
+  function fadeOut(elm,waitMs,processMs) {
+    setTimeout(() => {
+      // フェードアウト処理
+      elm.style.transition = 'opacity 1s';  // フェードアウトのためのトランジション
+      elm.style.opacity = '0';  // 完全に透明にする
+
+      // フェードアウト完了後に非表示にする
+      setTimeout(() => {
+        elm.classList.add('d-none');  // 完全に消す
+        elm.style.opacity = '1';  // 次に使うときのために透明度をリセット
+      }, processMs);  // 1秒後に非表示に
+    }, waitMs);  // メッセージが表示されてから1.5秒後にフェードアウトを開始
   }
 
   function loadStoredData() {
