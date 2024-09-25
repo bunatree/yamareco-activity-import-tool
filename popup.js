@@ -1,15 +1,19 @@
 document.addEventListener('DOMContentLoaded', async function() {
 
+  // ブラウザーの言語設定を取得
+  const userLang = navigator.language || navigator.userLanguage; // 'ja', 'en-US', etc.
+  const lang = userLang.startsWith('ja') ? 'ja' : 'en';
+
   const dropAreaElm = document.getElementById('drop-area');
-  dropAreaElm.querySelector('.msg').textContent = 'ドラッグ＆ドロップ';
-  dropAreaElm.querySelector('.file-name').textContent = 'activity.json';
+  
+  i18nActivity(lang);
+  i18nDropArea(lang);
+  i18nButtons(lang);
 
   setupDismissAlert();
 
   // ヤマレコの山行記録作成/編集ページを開いているかチェック
   const yamarecoStep = await getYamarecoStep();
-
-  console.log('#### yamarecoStep = ' + yamarecoStep);
 
   if (yamarecoStep === -1) {
 
@@ -274,4 +278,27 @@ function setupDismissAlert() {
       setButtonStateAll([false,false,false]); // 全ボタンをdisabled
     });
   });
+}
+
+function i18nButtons(lang) {
+  const btn1Elm = document.getElementById('step1');
+  const btn2Elm = document.getElementById('step2');
+  const btn4Elm = document.getElementById('step4');
+  btn1Elm.title = i18n[lang].btn_step1_title;
+  btn1Elm.querySelector('.btn-label').textContent = i18n[lang].btn_step1_label;
+  btn2Elm.title = i18n[lang].btn_step2_title;
+  btn2Elm.querySelector('.btn-label').textContent = i18n[lang].btn_step2_label;
+  btn4Elm.title = i18n[lang].btn_step4_title;
+  btn4Elm.querySelector('.btn-label').textContent = i18n[lang].btn_step4_label;
+}
+
+function i18nDropArea(lang) {
+  const dropAreaElm = document.getElementById('drop-area');
+  dropAreaElm.querySelector('.msg').textContent = i18n[lang].drop_area_title;
+  dropAreaElm.querySelector('.file-name').textContent = 'activity.json';
+}
+
+function i18nActivity(lang) {
+  const closeElm = document.querySelector('#activity .btn-close');
+  closeElm.title = i18n[lang].activity_close_title;
 }
