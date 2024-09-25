@@ -114,8 +114,6 @@ function getAreaFromMapName(mapName) {
 
 
 async function yamaRecoStep1(jsonData) {
-  console.log('#### function yamaRecoStep1');
-  console.log({jsonData})
 
   // 場所
   const placeInputElm = document.querySelector('input[name="place"]');
@@ -164,9 +162,6 @@ async function yamaRecoStep1(jsonData) {
 
 function yamaRecoStep2(jsonData) {
 
-  console.log('#### function yamaRecoStep2');
-  console.log({jsonData})
-
   const photoList = document.querySelectorAll('.photo_list .pcomment');
   
   const photos = jsonData.photos;
@@ -175,10 +170,8 @@ function yamaRecoStep2(jsonData) {
   const minLength = Math.min(photos.length, photoList.length);
   
   for (let i = 0; i < minLength; i++) {
-    const memo = photos[i].memo;   // JSONデータからmemoを取得
+    const memo = photos[i].memo;      // JSONデータからmemoを取得
     const textareaElm = photoList[i]; // 該当のtextareaを取得
-    
-    // textareaにmemoを反映
     textareaElm.value = memo;
   }
   
@@ -191,16 +184,11 @@ function yamaRecoStep4(jsonData) {
   const textareaElm = document.getElementById('impression');
   if (textareaElm) {
     textareaElm.value = jsonData.description;
-    console.log('Inserted the description into the textarea.');
-  } else {
-    console.error('Couldn\' find the textarea with id impression');
   }
 
 }
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-  console.log({request});
-
   if (request.action === 'recordStep1') {
     yamaRecoStep1(request.data);
   } else if (request.action === 'recordStep2') {
@@ -208,5 +196,4 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   } else if (request.action === 'recordStep4') {
     yamaRecoStep4(request.data);
   }
-
 });
