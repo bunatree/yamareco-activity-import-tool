@@ -109,17 +109,11 @@ document.addEventListener('DOMContentLoaded', async function() {
       // 正常に読み込めた(^^)
       showAlert('activity.json 読み込み完了','success',true);
 
-      // 読み込んだ活動日記の概要などを表示
       showActivity(jsonData.date, jsonData.title, 'info');
-
-      // ファイルのドロップエリアを非表示
       hideDropArea();
-
-      // ボタンエリアを表示
-      const btnAreaElm = document.getElementById('button-area');
-      btnAreaElm.classList.remove('d-none');
+      showButtonArea();
   
-      // 念のため、今後の処理のためにデータを保存する
+      // ストレージにデータを保存する
       chrome.storage.local.set({ activityData: jsonData }, function() {
         console.log('データが保存されました');
       });
@@ -168,6 +162,16 @@ document.addEventListener('DOMContentLoaded', async function() {
 
   function hideDropArea() {
     dropAreaElm.classList.add('d-none');
+  }
+
+  function showButtonArea() {
+    const btnAreaElm = document.getElementById('button-area');
+    btnAreaElm.classList.remove('d-none');
+  }
+
+  function hideButtonArea() {
+    const btnAreaElm = document.getElementById('button-area');
+    btnAreaElm.classList.add('d-none');
   }
 
   function showAlert(htmlContent, type, autoHide) {
