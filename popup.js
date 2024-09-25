@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   dropAreaElm.querySelector('.msg').textContent = 'ドラッグ＆ドロップ';
   dropAreaElm.querySelector('.file-name').textContent = 'activity.json';
 
-  setupClickEventOnTrash();
+  setupDismissAlert();
 
   // ヤマレコの山行記録作成/編集ページを開いているかチェック
   const yamarecoStep = await getYamarecoStep();
@@ -264,9 +264,9 @@ function loadStoredData() {
   });
 }
 
-function setupClickEventOnTrash() {
-  const trashIconElm = document.querySelector('#activity .trash i');
-  trashIconElm.addEventListener('click', (event) => {
+function setupDismissAlert() {
+  const btnElm = document.querySelector('#activity .btn-close');
+  btnElm.addEventListener('click', (event) => {
     chrome.storage.local.remove('activityData', function() {
       showAlert('データが削除されました', 'success', true);
       showDropArea();

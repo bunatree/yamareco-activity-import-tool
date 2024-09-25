@@ -27,9 +27,6 @@ h1#page-title {
     white-space: nowrap;
     overflow-x: hidden;
   }
-  .trash i {
-    cursor: pointer;
-  }
 }
 
 #button-area-title {

@@ -12,21 +12,15 @@
 
   <div id="alert" class="alert d-none mb-2"></div>
 
-  <div id="activity" class="alert alert-info d-none mb-2">
-    <div class="d-flex">
-      <div class="summary overflow-hidden">
-        <div class="date"></div>
-        <div class="title"></div>
-      </div>
-      <div class="trash">
-        <i class="bi bi-trash" title="データをクリアする"></i>
-      </div>
-    </div>
+  <div id="activity" class="alert alert-info d-none mb-2 alert-dismissible">
+    <div class="date"></div>
+    <div class="title"></div>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="データをクリアする" title="データをクリアする"></button>
   </div>
 
-  <div id="drop-area" class="d-none mb-2">
-    <div class="upload"><i class="bi bi-upload" title="Upload activity.json"></i></div>
-    <div class="msg"></div>
+  <div id="drop-area" class="d-none mb-2 rounded-1">
+    <div class="upload h2"><i class="bi bi-upload" title="Upload activity.json"></i></div>
+    <div class="msg fw-bold"></div>
     <div class="file-name"></div>
   </div>
 
@@ -44,7 +38,6 @@
       <span class="badge bg-white text-secondary">4</span>
       <span class="btn-label flex-grow-1">感想</span>
     </button>
-    <!-- <button id="clear" class="btn btn-sm btn-secondary" title="読み込み済みデータをクリアする">データ クリア</button> -->
   </div>
 
   <script src="popup.js"></script>
