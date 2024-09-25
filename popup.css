@@ -14,16 +14,11 @@ h1#page-title {
   padding: 20px;
   text-align: center;
   background-color: #f9f9f9;
-  margin-bottom: 10px; /* メッセージとの間隔 */
 }
 
 #drop-area.dragover {
   border-color: #333;
   background-color: #eee;
-}
-
-p {
-  margin: 0;
 }
 
 #activity {
@@ -35,4 +30,9 @@ p {
   .trash i {
     cursor: pointer;
   }
+}
+
+#button-area-title {
+  font-size: 1rem;
+  font-weight: bold;
 }

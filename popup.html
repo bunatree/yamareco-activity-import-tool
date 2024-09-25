@@ -8,11 +8,11 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
 </head>
 <body>
-  <h1 id="page-title" class="text-center">ヤマレコ<br>山行記録インポート</h1>
+  <h1 id="page-title" class="text-center mb-2">ヤマレコ<br>山行記録インポート</h1>
 
-  <div id="alert" class="alert d-none"></div>
+  <div id="alert" class="alert d-none mb-2"></div>
 
-  <div id="activity" class="alert alert-info d-none">
+  <div id="activity" class="alert alert-info d-none mb-2">
     <div class="d-flex">
       <div class="summary overflow-hidden">
         <div class="date"></div>
@@ -24,16 +24,26 @@
     </div>
   </div>
 
-  <div id="drop-area" class="d-none">
+  <div id="drop-area" class="d-none mb-2">
     <div class="upload"><i class="bi bi-upload" title="Upload activity.json"></i></div>
     <div class="msg"></div>
     <div class="file-name"></div>
   </div>
 
-  <div id="button-area" class="d-none d-grid gap-2">
-    <button id="step1" class="btn btn-sm btn-secondary" title="日程・概要を反映させる">日程・概要を反映</button>
-    <button id="step2" class="btn btn-sm btn-secondary" title="写真メモを反映させる">写真メモを反映</button>
-    <button id="step4" class="btn btn-sm btn-secondary" title="感想を反映させる">感想を反映</button>
+  <h2 id="button-area-title" class="d-none">データ反映</h2>
+  <div id="button-area" class="d-grid gap-2">
+    <button id="step1" class="btn btn-sm btn-secondary d-flex align-items-center" title="日程・概要を反映させる">
+      <span class="badge bg-white text-secondary">1</span>
+      <span class="btn-label flex-grow-1">日程・概要</span>
+    </button>
+    <button id="step2" class="btn btn-sm btn-secondary d-flex align-items-center" title="写真メモを反映させる">
+      <span class="badge bg-white text-secondary">2</span>
+      <span class="btn-label flex-grow-1">写真メモ</span>
+    </button>
+    <button id="step4" class="btn btn-sm btn-secondary d-flex align-items-center" title="感想を反映させる">
+      <span class="badge bg-white text-secondary">4</span>
+      <span class="btn-label flex-grow-1">感想</span>
+    </button>
     <!-- <button id="clear" class="btn btn-sm btn-secondary" title="読み込み済みデータをクリアする">データ クリア</button> -->
   </div>
 

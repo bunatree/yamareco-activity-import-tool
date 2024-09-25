@@ -6,84 +6,42 @@ document.addEventListener('DOMContentLoaded', async function() {
 
   setupClickEventOnTrash();
 
-  // loadStoredDataを呼び出し、結果を待つ
-  const activityData = await loadStoredData();
-
-  if (activityData) {
-    // 保存済みactivityDataがある場合
-    console.log('Yes! Loading activityData...');
-    showActivity(activityData.date, activityData.title, 'info');
-  } else {
-    // 保存済みactivityDataがない場合
-    console.log('No activityData. Let the user upload activity.json.');
-    showDropArea();
-    // hideButtonArea();
-  }  
-
   // ヤマレコの山行記録作成/編集ページを開いているかチェック
   const yamarecoStep = await getYamarecoStep();
 
-  console.log('yamarecoStep = ' + yamarecoStep);
+  console.log('#### yamarecoStep = ' + yamarecoStep);
 
-  switch (yamarecoStep) {
-    case -1:
+  if (yamarecoStep === -1) {
+
       showAlert('この拡張機能は、ヤマレコの山行記録作成/編集ページでのみ使用できます。','info',false);
       hideDropArea();
       hideActivity();
-      break;
-    case 1:
-      showButtonArea();
-      setButtonStateAll([true,false,false]); // Enable button step1
-      break;
-    case 2:
-      showButtonArea();
-      setButtonStateAll([false,true,false]); // Enable button step2
-      break;
-    case 4:
-      showButtonArea();
-      setButtonStateAll([false,false,true]); // Enable button step4
-      break;
+      hideButtonArea();
+      setButtonStateAll([false,false,false]);
+
+  } else {
+
+    const activityData = await loadStoredData();
+
+    if (activityData) {
+      showActivity(activityData.date, activityData.title, 'info');
+      setButtonsStatePerStep(yamarecoStep);
+    } else {
+      showDropArea();
+      setButtonStateAll([false,false,false]);
+    }  
+
   }
 
-  // if (yamarecoStep) {
-  //   showButtonArea();//####
-  //   // Enable/disable buttons based on the URL
-  //   if (url.pathname.includes('step1_create.php') || url.pathname.includes('step1_edit.php')) {
-  //     setButtonStateAll([true,false,false]); // Enable step1
-  //   } else if (url.pathname.includes('step2_photo.php')) {
-  //     setButtonStateAll([false,true,false]); // Enable step2
-  //   } else if (url.pathname.includes('step4_imp.php')) {
-  //     setButtonStateAll([false,false,true]); // Enable step4
-  //   }
-  // } else {
-    
-  // }
-
-  // 現在のアクティブタブのURLを取得
-  // chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-  //   const currentTab = tabs[0];
-  //   const url = new URL(currentTab.url);
-
-  //   if (url.hostname.includes('yamareco.com') && url.pathname.includes('/modules/yamareco')) {
-    
-  //   } else {
-      
-      
-  //   }
-  // });
-
-  // ドラッグオーバー時にスタイルを変更
   dropAreaElm.addEventListener('dragover', (event) => {
     event.preventDefault();
     dropAreaElm.classList.add('dragover');
   });
 
-  // ドラッグが終了したらスタイルを戻す
   dropAreaElm.addEventListener('dragleave', () => {
     dropAreaElm.classList.remove('dragover');
   });
 
-  // ドロップされたときの処理
   dropAreaElm.addEventListener('drop', (event) => {
     event.preventDefault();
     dropAreaElm.classList.remove('dragover');
@@ -99,19 +57,15 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
   });
 
-  // ボタンがクリックされたときの動作
   document.getElementById('step1').addEventListener('click', function() {
-    console.log("You clicked button step1!");
     sendActionToTab('recordStep1');
   });
 
   document.getElementById('step2').addEventListener('click', function() {
-    console.log("You clicked button step2!");
     sendActionToTab('recordStep2');
   });
 
   document.getElementById('step4').addEventListener('click', function() {
-    console.log("You clicked button step4!");
     sendActionToTab('recordStep4');
   });
 
@@ -156,14 +110,13 @@ function getYamarecoStep() {
   });
 }
 
-// ファイルを読み込む
-function readFile(file) {
+async function readFile(file) {
   const reader = new FileReader();
   
-  reader.onload = function(event) {
+  reader.onload = async function(event) {
     const content = event.target.result;
 
-    // JSON形式かどうかを確認するためのトライキャッチブロック
+    // JSON形式かどうかを確認
     let jsonData;
     try {
       // JSON形式であればオブジェクトに変換
@@ -174,22 +127,17 @@ function readFile(file) {
       return; // 処理を中断
     }
 
-    // 正常に読み込めた(^^)
     showAlert('activity.json 読み込み完了','success',true);
-
     showActivity(jsonData.date, jsonData.title, 'info');
     hideDropArea();
-    showButtonArea();
 
-    // ストレージにデータを保存する
     chrome.storage.local.set({ activityData: jsonData }, function() {
-      console.log('データが保存されました');
+      console.log('Saved JSON data to the storage.');
     });
 
-    // 現在のタブにデータを送信する
-    // chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-    //   chrome.tabs.sendMessage(tabs[0].id, { action: 'importActivityData', data: jsonData });
-    // });
+    const yamarecoStep = await getYamarecoStep();
+    setButtonsStatePerStep(yamarecoStep);
+
   };
 
   reader.onerror = function() {
@@ -198,6 +146,20 @@ function readFile(file) {
 
   // ファイルをテキストとして読み込む
   reader.readAsText(file);
+}
+
+function setButtonsStatePerStep(yamarecoStep) {
+  switch (yamarecoStep) {
+    case 1:
+      setButtonStateAll([true,false,false]); // Enable button step1
+      break;
+    case 2:
+      setButtonStateAll([false,true,false]); // Enable button step2
+      break;
+    case 4:
+      setButtonStateAll([false,false,true]); // Enable button step4
+      break;
+  }
 }
 
 function setButtonStateAll(arrayState) {
@@ -211,14 +173,19 @@ function setButtonStateAll(arrayState) {
 
 function setButtonState(buttonId,state) {
   const btnElm = document.getElementById(buttonId);
+  const badgeElm = btnElm.querySelector('.badge');
   if (state) {
     btnElm.disabled = false;
     btnElm.classList.remove('btn-secondary');
     btnElm.classList.add('btn-primary');
+    badgeElm.classList.remove('text-secondary');
+    badgeElm.classList.add('text-primary');
   } else {
     btnElm.disabled = true;
     btnElm.classList.remove('btn-primary');
     btnElm.classList.add('btn-secondary');
+    badgeElm.classList.remove('text-primary');
+    badgeElm.classList.add('text-secondary');
   }
 }
 
@@ -304,7 +271,7 @@ function setupClickEventOnTrash() {
       showAlert('データが削除されました', 'success', true);
       showDropArea();
       hideActivity();
-      hideButtonArea();
+      setButtonStateAll([false,false,false]); // 全ボタンをdisabled
     });
   });
 }
