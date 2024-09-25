@@ -1,4 +1,4 @@
-# yamareco-activity-import-tool
+# Yamareco Activity Import Tool
 ## YAMAPからエクスポートされたデータをヤマレコに山行記録としてインポートするChrome拡張機能
 
 この Chrome 拡張機能は、拙作の YAMAP Activity Export Tool (YAMAPの活動日記をエクスポートするChrome拡張機能) によってエクスポートされた活動日記データをヤマレコに山行記録としてアップロードするためのお助けツールです。
