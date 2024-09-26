@@ -24,3 +24,15 @@ YAMAP からのエクスポートしたデータをそのままヤマレコの�
 ステップ 2 では、YAMAP からエクスポートした写真を手動で指定して登録してください。
 
 ステップ 3 では、YAMAP からエクスポートした GPX ファイルを手動で指定して登録してください。
+
+## ライセンス
+
+[Bleach free icon by Freepik - Flaticon](https://www.flaticon.com/free-icon/bleach_481058) … Free for personal and commercial purpose with attribution.
+
+[Arrow free icon created by prinda895 - Flaticon](https://www.flaticon.com/free-icon/arrow_16111384) ... Free for personal and commercial purpose with attribution.
+
+## 動作確認
+
+Browser: Google Chrome 128.0.6613.120 (Official Build) (arm64)
+
+OS: macOS バージョン14.6.1（ビルド23G93）
