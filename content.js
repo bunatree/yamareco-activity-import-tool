@@ -215,14 +215,19 @@ function yamaRecoStep2(jsonData) {
 
   const photoList = document.querySelectorAll('.photo_list .pcomment');
   
+  if (photoList.length === 0) {
+    alert("写真メモのテキスト入力欄が見つかりません。\n写真をアップロードしてから再度ボタンをクリックしてください。");
+    return;
+  }
+
   const photos = jsonData.photos;
   
   // photos配列の長さとtextareaの数を考慮して、少ない方の数でループを回す
   const minLength = Math.min(photos.length, photoList.length);
   
   for (let i = 0; i < minLength; i++) {
-    const memo = photos[i].memo;      // JSONデータからmemoを取得
-    const textareaElm = photoList[i]; // 該当のtextareaを取得
+    const memo = photos[i].memo;      // JSONデータからメモを取得
+    const textareaElm = photoList[i]; // メモ反映先のtextareaを取得
     textareaElm.value = memo;
   }
   
